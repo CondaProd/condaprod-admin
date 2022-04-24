@@ -27,12 +27,18 @@ func (s *Service) StatsWSHandler(c echo.Context) error {
 			ws.WriteJSON(map[string]interface{}{
 				"error": err,
 			})
+			return
 		}
 		ws.WriteJSON(stat)
 		for {
+			memory, err := linux.ReadMemInfo("/proc/meminfo")
+			if err != nil {
+				return
+			}
+			ws.WriteJSON(memory)
 			time.Sleep(time.Second * 1)
 		}
 	}()
 
-	return nil // upgrade to websockets
+	return nil
 }
